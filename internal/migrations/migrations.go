@@ -1,9 +1,10 @@
 package migrations
 
 import (
+	"io/ioutil"
+
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 )
 
 func MigrationUp(db *sqlx.DB) error {
@@ -11,10 +12,10 @@ func MigrationUp(db *sqlx.DB) error {
 
 	query, err := ioutil.ReadFile("internal/migrations/001_driversUp.sql")
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 	if _, err := db.Exec(string(query)); err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	log.Info("End Migration")
@@ -26,10 +27,10 @@ func MigrationDown(db *sqlx.DB) error {
 
 	query, err := ioutil.ReadFile("internal/migrations/001_driversDown.sql")
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 	if _, err := db.Exec(string(query)); err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	log.Info("End Migration")

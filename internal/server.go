@@ -2,6 +2,10 @@ package internal
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/config"
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/handler"
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/migrations"
@@ -11,9 +15,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
-	"time"
 )
 
 type Server struct {
@@ -27,7 +28,7 @@ func initLogger() {
 	log.SetFormatter(&log.JSONFormatter{})
 }
 
-func Inject() *gin.Engine {
+func Inject() (*gin.Engine, error) {
 	cfg := config.NewDbConfig()
 
 	connection := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
@@ -35,39 +36,41 @@ func Inject() *gin.Engine {
 	log.Printf(connection)
 	db, err := sqlx.Open("postgres", connection)
 	if err != nil {
-		log.Fatalf(err.Error())
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf(err.Error())
+		return nil, err
 	}
 
 	log.Printf("Start migrating database \n")
 	err = migrations.MigrationUp(db)
 	if err != nil {
-		log.Fatalf(err.Error())
+		return nil, err
 	}
 
-	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
+	driverRepository := repository.NewDriverRepository(db)
+	driverService := service.NewDriverService(driverRepository)
+	authService := service.NewAuthorizationService(driverRepository)
+	handlers := handler.NewHandler(driverService, authService)
 
 	router := handlers.InitRoutes()
 
 	router.Group("/").GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{"status": "alive"})
-		return
 	})
 
-	return router
+	return router, nil
 }
 
 func (s *Server) Run(port string) error {
 	initLogger()
-	config.EnvsCheck()
 
-	router := Inject()
+	router, err := Inject()
+	if err != nil {
+		return err
+	}
 	s.server = &http.Server{
 		Addr:           ":" + port,
 		Handler:        router,
