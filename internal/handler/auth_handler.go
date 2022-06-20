@@ -23,23 +23,23 @@ import (
 func (h *Handler) signUp(c *gin.Context) {
 	json := domain.Driver{}
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, responses.NewServerResponse(err.Error()))
+		c.AbortWithStatusJSON(http.StatusBadRequest, responses.NewServerResponse(false, err.Error()))
 		return
 	}
 	simplePassword := json.PasswordHash
 	driver, err := h.driverService.CreateDriver(&json)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
 		return
 	}
 
 	token, err := h.authorizationService.GenerateToken(json.Phone, simplePassword)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, responses.NewServerResponse(map[string]interface{}{
+	c.JSON(http.StatusOK, responses.NewServerResponse(true, map[string]interface{}{
 		"driver": driver,
 		"token":  token,
 	}))
@@ -65,21 +65,21 @@ type signInInput struct {
 func (h *Handler) signIn(c *gin.Context) {
 	json := signInInput{}
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
 		return
 	}
 	token, err := h.authorizationService.GenerateToken(json.Phone, json.PasswordHash)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
 		return
 	}
 
 	driverFull, err := h.driverService.GetDriverByPhone(json.Phone)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
 		return
 	}
-	userResponse := domain.DriverResponse{
+	driverResponse := domain.DriverResponse{
 		ID:       driverFull.ID,
 		Name:     driverFull.Name,
 		Phone:    driverFull.Phone,
@@ -88,8 +88,8 @@ func (h *Handler) signIn(c *gin.Context) {
 		TaxiType: driverFull.TaxiType,
 	}
 
-	c.JSON(http.StatusOK, responses.NewServerResponse(map[string]interface{}{
-		"user":  userResponse,
-		"token": token,
+	c.JSON(http.StatusOK, responses.NewServerResponse(true, map[string]interface{}{
+		"driver": driverResponse,
+		"token":  token,
 	}))
 }

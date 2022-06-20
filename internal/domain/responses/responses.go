@@ -5,9 +5,9 @@ type ServerResponse struct {
 	Msg     interface{} `json:"msg"`
 }
 
-func NewServerResponse(msg interface{}) *ServerResponse {
+func NewServerResponse(success bool, msg interface{}) *ServerResponse {
 	return &ServerResponse{
-		Success: true,
+		Success: success,
 		Msg:     msg,
 	}
 }
