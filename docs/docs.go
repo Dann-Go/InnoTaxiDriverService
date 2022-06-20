@@ -44,25 +44,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerGoodResponse"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerError"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerError"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerError"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     }
                 }
@@ -96,25 +96,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerGoodResponse"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerError"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerError"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/responses.ServerError"
+                            "$ref": "#/definitions/responses.ServerResponse"
                         }
                     }
                 }
@@ -169,18 +169,7 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.ServerError": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "responses.ServerGoodResponse": {
+        "responses.ServerResponse": {
             "type": "object",
             "properties": {
                 "msg": {},

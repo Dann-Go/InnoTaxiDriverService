@@ -15,31 +15,31 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        input body domain.Driver true "Driver info"
-// @Success      200  {object}  responses.ServerGoodResponse
-// @Failure      400  {object}  responses.ServerError
-// @Failure      404  {object}  responses.ServerError
-// @Failure      500  {object}  responses.ServerError
+// @Success      200  {object}  responses.ServerResponse
+// @Failure      400  {object}  responses.ServerResponse
+// @Failure      404  {object}  responses.ServerResponse
+// @Failure      500  {object}  responses.ServerResponse
 // @Router       /auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	json := domain.Driver{}
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, responses.NewServerError(err.Error()))
+		c.AbortWithStatusJSON(http.StatusBadRequest, responses.NewServerResponse(err.Error()))
 		return
 	}
 	simplePassword := json.PasswordHash
 	driver, err := h.driverService.CreateDriver(&json)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerError(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
 		return
 	}
 
 	token, err := h.authorizationService.GenerateToken(json.Phone, simplePassword)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerError(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, responses.NewServerGoodResponse(map[string]interface{}{
+	c.JSON(http.StatusOK, responses.NewServerResponse(map[string]interface{}{
 		"driver": driver,
 		"token":  token,
 	}))
@@ -57,26 +57,26 @@ type signInInput struct {
 // @Accept       json
 // @Produce      json
 // @Param        input body signInInput true "Driver signIN info"
-// @Success      200  {object}  responses.ServerGoodResponse
-// @Failure      400  {object}  responses.ServerError
-// @Failure      404  {object}  responses.ServerError
-// @Failure      500  {object}  responses.ServerError
+// @Success      200  {object}  responses.ServerResponse
+// @Failure      400  {object}  responses.ServerResponse
+// @Failure      404  {object}  responses.ServerResponse
+// @Failure      500  {object}  responses.ServerResponse
 // @Router       /auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	json := signInInput{}
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerError(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
 		return
 	}
 	token, err := h.authorizationService.GenerateToken(json.Phone, json.PasswordHash)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerError(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
 		return
 	}
 
 	driverFull, err := h.driverService.GetDriverByPhone(json.Phone)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerError(err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(err.Error()))
 		return
 	}
 	userResponse := domain.DriverResponse{
@@ -88,7 +88,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		TaxiType: driverFull.TaxiType,
 	}
 
-	c.JSON(http.StatusOK, responses.NewServerGoodResponse(map[string]interface{}{
+	c.JSON(http.StatusOK, responses.NewServerResponse(map[string]interface{}{
 		"user":  userResponse,
 		"token": token,
 	}))

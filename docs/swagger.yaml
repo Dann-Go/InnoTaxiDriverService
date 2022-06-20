@@ -32,14 +32,7 @@ definitions:
     - passwordHash
     - phone
     type: object
-  responses.ServerError:
-    properties:
-      error:
-        type: string
-      success:
-        type: boolean
-    type: object
-  responses.ServerGoodResponse:
+  responses.ServerResponse:
     properties:
       msg: {}
       success:
@@ -70,19 +63,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.ServerGoodResponse'
+            $ref: '#/definitions/responses.ServerResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/responses.ServerError'
+            $ref: '#/definitions/responses.ServerResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/responses.ServerError'
+            $ref: '#/definitions/responses.ServerResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ServerError'
+            $ref: '#/definitions/responses.ServerResponse'
       summary: SignIn
       tags:
       - auth
@@ -104,19 +97,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.ServerGoodResponse'
+            $ref: '#/definitions/responses.ServerResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/responses.ServerError'
+            $ref: '#/definitions/responses.ServerResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/responses.ServerError'
+            $ref: '#/definitions/responses.ServerResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/responses.ServerError'
+            $ref: '#/definitions/responses.ServerResponse'
       summary: SignUp
       tags:
       - auth
