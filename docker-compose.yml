@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+
+  db-driver:
+    image: postgres:latest
+    restart: on-failure
+    environment:
+      POSTGRES_PASSWORD: "12345678"
+      POSTGRES_USER: "grimdan"
+      POSTGRES_DB: "driverservicedb"
+    ports:
+      - '5438:5432'
+  web-app:
+    restart: on-failure
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file:
+      - local.env
+    ports:
+      - '8001:8001'
+    depends_on:
+      - db-driver

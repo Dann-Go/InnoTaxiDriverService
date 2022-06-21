@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS drivers;
+
+DROP INDEX IF EXISTS phone_idx;
+DROP INDEX IF EXISTS email_idx;

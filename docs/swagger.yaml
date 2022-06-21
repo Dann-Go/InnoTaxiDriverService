@@ -1,0 +1,116 @@
+basePath: /
+definitions:
+  domain.Driver:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      passwordHash:
+        type: string
+      phone:
+        type: string
+      rating:
+        type: number
+      taxiType:
+        type: string
+    required:
+    - email
+    - passwordHash
+    - phone
+    - taxiType
+    type: object
+  handler.signInInput:
+    properties:
+      passwordHash:
+        type: string
+      phone:
+        type: string
+    required:
+    - passwordHash
+    - phone
+    type: object
+  responses.ServerResponse:
+    properties:
+      msg: {}
+      success:
+        type: boolean
+    type: object
+host: localhost:8001
+info:
+  contact: {}
+  description: This is a driver microservice for InnoTaxi App.
+  title: InnoTaxi Driver Microservice
+  version: "1.0"
+paths:
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Check if driver exists and generate token
+      parameters:
+      - description: Driver signIN info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create driver
+      parameters:
+      - description: Driver info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Driver'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ServerResponse'
+      summary: SignUp
+      tags:
+      - auth
+swagger: "2.0"
