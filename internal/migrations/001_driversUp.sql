@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS drivers (
                        Email TEXT,
                        Password_hash TEXT,
                        Rating FLOAT DEFAULT 0.0,
-                       Taxi_type TEXT
+                       Taxi_type TEXT,
+                       Status TEXT DEFAULT 'free'
 );
 
 CREATE INDEX IF NOT EXISTS phone_idx ON drivers (phone);

@@ -16,8 +16,29 @@ type DbPostgresConfig struct {
 	SSLMode  string
 }
 
+type ServerConfig struct {
+	Port string
+}
+
+type AuthConfig struct {
+	TokenTTL   string
+	SigningKey string
+}
+
+func NewServerConfig() *ServerConfig {
+	return &ServerConfig{
+		Port: os.Getenv("SERVPORT"),
+	}
+}
+
+func NewAuthConfig() *AuthConfig {
+	return &AuthConfig{
+		SigningKey: os.Getenv("SIGNINGKEY"),
+		TokenTTL:   os.Getenv("TOKENTTL")}
+}
+
 func NewDbConfig() *DbPostgresConfig {
-	cfg := &DbPostgresConfig{
+	return &DbPostgresConfig{
 		Host:     os.Getenv("HOST"),
 		Port:     os.Getenv("DBPORT"),
 		Username: os.Getenv("USERNAME"),
@@ -26,7 +47,6 @@ func NewDbConfig() *DbPostgresConfig {
 		SSLMode:  os.Getenv("SSLMODE"),
 	}
 
-	return cfg
 }
 
 func EnvsCheck() error {

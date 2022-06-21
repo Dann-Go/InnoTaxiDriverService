@@ -2,10 +2,12 @@ package service
 
 import (
 	"errors"
-	"github.com/Dann-Go/InnoTaxiDriverService/internal/repository"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/Dann-Go/InnoTaxiDriverService/internal/domain/apperrors"
+	"github.com/Dann-Go/InnoTaxiDriverService/internal/repository"
 
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
@@ -40,7 +42,7 @@ func (ms *AuthorizationService) GenerateToken(phone, password string) (string, e
 		return "", err
 	}
 	if isValid := checkPasswordHash(password, driver.PasswordHash); !isValid {
-		err := errors.New("wrong password")
+		err := apperrors.Wrapper(apperrors.ErrWrongPassword, err)
 		return "", err
 	}
 
@@ -58,7 +60,7 @@ func (ms *AuthorizationService) GenerateToken(phone, password string) (string, e
 func (ms *AuthorizationService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid signing method")
+			return nil, apperrors.Wrapper(apperrors.ErrInvalidSigningMethod, errors.New("invalid signing method"))
 		}
 		return []byte(signingKey), nil
 	})
@@ -68,7 +70,7 @@ func (ms *AuthorizationService) ParseToken(accessToken string) (int, error) {
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, errors.New("token claims are not of type *tokenClaims")
+		return 0, apperrors.Wrapper(apperrors.ErrWrongTokenClaims, errors.New("wrong token claims"))
 	}
 
 	return claims.DriverId, err

@@ -3,6 +3,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/Dann-Go/InnoTaxiDriverService/internal/domain/apperrors"
+
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/domain"
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/domain/responses"
 	"github.com/gin-gonic/gin"
@@ -23,19 +25,19 @@ import (
 func (h *Handler) signUp(c *gin.Context) {
 	json := domain.Driver{}
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, responses.NewServerResponse(false, err.Error()))
+		apperrors.ErrorResponse(c, apperrors.Wrapper(apperrors.ErrBadRequest, err))
 		return
 	}
 	simplePassword := json.PasswordHash
 	driver, err := h.driverService.CreateDriver(&json)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
+		apperrors.ErrorResponse(c, err)
 		return
 	}
 
 	token, err := h.authorizationService.GenerateToken(json.Phone, simplePassword)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
+		apperrors.ErrorResponse(c, err)
 		return
 	}
 
@@ -65,18 +67,18 @@ type signInInput struct {
 func (h *Handler) signIn(c *gin.Context) {
 	json := signInInput{}
 	if err := c.ShouldBindJSON(&json); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
+		apperrors.ErrorResponse(c, apperrors.Wrapper(apperrors.ErrBadRequest, err))
 		return
 	}
 	token, err := h.authorizationService.GenerateToken(json.Phone, json.PasswordHash)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
+		apperrors.ErrorResponse(c, err)
 		return
 	}
 
 	driverFull, err := h.driverService.GetDriverByPhone(json.Phone)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, responses.NewServerResponse(false, err.Error()))
+		apperrors.ErrorResponse(c, err)
 		return
 	}
 	driverResponse := domain.DriverResponse{

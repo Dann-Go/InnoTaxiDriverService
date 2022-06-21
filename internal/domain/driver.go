@@ -8,4 +8,5 @@ type Driver struct {
 	Email        string  `db:"email" json:"email" binding:"required,email"`
 	Rating       float32 `db:"rating" json:"rating" binding:"omitempty"`
 	TaxiType     string  `db:"taxi_type" json:"taxiType" binding:"required"`
+	Status       string  `db:"status" json:"status" binding:"omitempty"`
 }

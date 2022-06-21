@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"github.com/Dann-Go/InnoTaxiDriverService/internal/domain/apperrors"
 
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/domain"
 	"github.com/Dann-Go/InnoTaxiDriverService/internal/repository"
@@ -20,11 +20,11 @@ type DriverService struct {
 func (s *DriverService) CreateDriver(driver *domain.Driver) (*domain.DriverResponse, error) {
 	driver.PasswordHash = HashPassword(driver.PasswordHash)
 
-	if driverCheck, _ := s.repo.GetDriverByPhone(driver.Phone); driverCheck.Phone != "" {
-		return nil, errors.New("driver with such phone already exists")
+	if driverCheck, err := s.repo.GetDriverByPhone(driver.Phone); driverCheck.Phone != "" {
+		return nil, apperrors.Wrapper(apperrors.ErrPhoneIsAlreadyTaken, err)
 
-	} else if driverCheck, _ := s.repo.GetDriverByEmail(driver.Email); driverCheck.Email != "" {
-		return nil, errors.New("driver with such email already exists")
+	} else if driverCheck, err = s.repo.GetDriverByEmail(driver.Email); driverCheck.Email != "" {
+		return nil, apperrors.Wrapper(apperrors.ErrEmailIsAlreadyTaken, err)
 	}
 
 	return s.repo.CreateDriver(driver)
